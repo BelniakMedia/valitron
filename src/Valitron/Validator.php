@@ -1546,7 +1546,7 @@ class Validator
             }
         } else {
             $message = $this->prepend_labels
-                ? str_replace('{field}', ucwords(str_replace('_', ' ', $field)), $message)
+                ? str_replace('{field}', "`$field`", $message)
                 : str_replace('{field} ', '', $message);
         }
 
