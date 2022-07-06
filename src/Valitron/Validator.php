@@ -939,6 +939,52 @@ class Validator
     }
 
     /**
+     * Validates whether a field is required based on the value of other fields.
+     *
+     * @param string $field name of the field in the data array
+     * @param mixed $value value of this field
+     * @param array $params parameters for this rule
+     * @param array $fields full list of data to be validated
+     * @return bool
+     */
+    protected function validateRequiredWhen($field, $value, $params, $fields)
+    {
+        $conditionallyReq = false;
+        // if we actually have conditionally required with fields to check against
+        if (isset($params[0])) {
+            // convert single value to array if it isn't already
+            $reqParams = is_array($params[0]) ? $params[0] : array($params[0]);
+            // check for the flag indicating if all fields are required
+            $allRequired = isset($params[1]) && (bool)$params[1];
+            // check for the flag indicating if boolean value on the required field should be accounted for
+            $checkBool = isset($params[2]) && (bool)$params[2];
+            $emptyFields = 0;
+            foreach ($reqParams as $requiredField => $requiredValue) {
+                // Make sure the required field is set to the required value
+                if (isset($fields[$requiredField]) && $fields[$requiredField] == $requiredValue) {
+                    if (!$allRequired) {
+                        $conditionallyReq = true;
+                        break;
+                    } else {
+                        $emptyFields++;
+                    }
+                }
+            }
+            // if all required fields are present in strict mode, we're requiring it
+            if ($allRequired && $emptyFields === count($reqParams)) {
+                $conditionallyReq = true;
+            }
+        }
+        // if we have conditionally required fields
+        if ($conditionallyReq && (is_null($value) ||
+                is_string($value) && trim($value) === '')) {
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
      * Validates whether a field is required based on whether other fields are present.
      *
      * @param string $field name of the field in the data array
@@ -1198,8 +1244,8 @@ class Validator
     }
 
     private function validationMustBeExcecuted($validation, $field, $values, $multiple){
-        //always excecute requiredWith(out) rules
-        if (in_array($validation['rule'], array('requiredWith', 'requiredWithout'))){
+        //always excecute requiredWith(out)/when rules
+        if (in_array($validation['rule'], array('requiredWith', 'requiredWithout', 'requiredWhen'))){
             return true;
         }
 
