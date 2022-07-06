@@ -1,9 +1,9 @@
 {
-    "name": "rickkukiela/valitron",
+    "name": "belniakmedia/valitron",
     "type": "library",
     "description": "Simple, elegant, stand-alone validation library with NO dependencies",
     "keywords": ["validation", "validator", "valid"],
-    "homepage": "https://github.com/RickKukiela/valitron",
+    "homepage": "https://github.com/BelniakMedia/valitron",
     "license": "BSD-3-Clause",
     "authors": [
         {
